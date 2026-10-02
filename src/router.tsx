@@ -1,11 +1,20 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { Button } from './components/shared/Button.tsx'
+import { PiggyBank } from 'lucide-react'
 
 export const router = createBrowserRouter([
   {
     children: [
       {
         path: '/',
-        element: <h1>Formulário de Simulação</h1>,
+        element: (
+          <>
+            <h1>Formulário de Simulação</h1>
+            <Button variant="primary" icon={PiggyBank}>
+              Clique aqui
+            </Button>
+          </>
+        ),
       },
       {
         path: '/resultado',
