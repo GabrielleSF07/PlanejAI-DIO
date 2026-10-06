@@ -1,19 +1,12 @@
-import { type PropsWithChildren, useState, useEffect } from 'react'
+import { type PropsWithChildren, useEffect, useState } from 'react'
 
 import { type Theme, ThemeContext } from './ThemeContext'
 
 export function ThemeProvider({ children }: PropsWithChildren) {
-  const [theme, setTheme] = useState<Theme>('light')
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
   const [theme, setTheme] = useState<Theme>(() => {
-    const localStorageTheme = localStorage.getItem('theme') as Theme | null
+    const localStorageTheme = localStorage.getItem('theme')
 
-    if (localStorageTheme) {
+    if (localStorageTheme === 'light' || localStorageTheme === 'dark') {
       return localStorageTheme
     }
 
@@ -23,6 +16,11 @@ export function ThemeProvider({ children }: PropsWithChildren) {
 
     return systemPrefersDark ? 'dark' : 'light'
   })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === 'light' ? 'dark' : 'light'))
