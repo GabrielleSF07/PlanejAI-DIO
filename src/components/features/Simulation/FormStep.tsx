@@ -1,8 +1,8 @@
 import { ArrowLeft, ArrowRight, type LucideIcon } from 'lucide-react'
+import { type SyntheticEvent,useState } from 'react'
 
 import { Button } from '@/components/shared/Button'
 import { Input, type InputProps } from '@/components/shared/Input'
-import { useState, type SyntheticEvent } from 'react'
 import { formatCurrencyMask } from '@/util/currency'
 
 export interface FormStepProps {
@@ -83,7 +83,6 @@ export function FormStep({
 
           <Button
             type="submit"
-            onClick={() => onNext(inputValue)}
             variant="primary"
             disabled={!inputValue}
             className="order-1 flex-1 sm:order-2"
