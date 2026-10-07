@@ -1,5 +1,4 @@
-import type { SimulationFormData } from '@/data/simulation'
-
+import { type SimulationFormData } from '@/data/simulation'
 export type SimulationRecord = SimulationFormData & { id: string }
 
 const LOCAL_STORAGE_KEY = 'simulation-data'
