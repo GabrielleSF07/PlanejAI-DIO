@@ -1,4 +1,4 @@
-import { Clock, Moon, Sun,TrendingUp, Wallet } from 'lucide-react'
+import { Clock, Moon, Sun, TrendingUp, Wallet } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { useTheme } from '@/hooks/useTheme'
@@ -12,7 +12,7 @@ export function Header() {
 
   return (
     <header className="border-b border-(--border) px-6 py-3">
-      <nav className="flex items-center justify-between">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between sm:px-2">
         <div className="flex items-center gap-2">
           <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-full">
             <Wallet size={20} className="text-primary-foreground" />
@@ -24,6 +24,8 @@ export function Header() {
         </div>
         <div className="flex items-center gap-1">
           <Button
+            aria-label="Nova simulação"
+            className="px-3 py-1.5 text-xs [&_svg]:size-4"
             variant="secondary"
             icon={TrendingUp}
             onClick={() => void navigate('/')}
@@ -31,6 +33,8 @@ export function Header() {
             <span className="hidden sm:inline">Nova Simulação</span>
           </Button>
           <Button
+            aria-label="Histórico"
+            className="px-3 py-1.5 text-xs [&_svg]:size-4"
             variant="ghost"
             icon={Clock}
             onClick={() => void navigate('/historico')}

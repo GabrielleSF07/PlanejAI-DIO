@@ -26,7 +26,11 @@ const updateSimulation = (id: string, data: Partial<SimulationRecord>) => {
 
 const saveFormData = (formData: SimulationFormData) => {
   const id = crypto.randomUUID()
-  const record: SimulationRecord = { ...formData, id }
+  const record: SimulationRecord = {
+    ...formData,
+    id,
+    createdAt: new Date().toISOString(),
+  }
 
   const savedData = getSimulations()
 

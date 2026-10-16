@@ -13,6 +13,8 @@
     --input: #fcfcfe;
     --skeleton-base-color: #e1e1f1;
     --skeleton-highlight-color: #c5c5df;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+    --input-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   }
 
   [data-theme='dark'] {
@@ -28,6 +30,8 @@
     --input: #232131;
     --skeleton-base-color: #3e3e42;
     --skeleton-highlight-color: #434052;
+    --card-shadow: none;
+    --input-shadow: none;
   }
 }
 
@@ -42,6 +46,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-secondary-button: var(--secondary-button);
   --color-input: var(--input);
+  --shadow-card: var(--card-shadow);
+  --shadow-input: var(--input-shadow);
   --color-skeleton-base: var(--skeleton-base-color);
   --color-skeleton-highlight: var(--skeleton-highlight-color);
   --color-red-500: #ef4444;
