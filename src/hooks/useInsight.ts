@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 
 import { buildAIPrompt } from '@/data/aiPrompt'
 import { useSimulationStorage } from '@/hooks/useSimulationStorage'
@@ -6,39 +6,28 @@ import { getInsight, type InsightData } from '@/services/aiService'
 
 export const useInsight = (id: string) => {
   const isRequestPending = useRef(false)
-  const { getFormData, updateSimulation } = useSimulationStorage()
-
-  const [insight, setInsight] = useState<InsightData | null>(() => {
-    const simulation = getFormData(id)
-    return simulation?.insight ?? null
-  })
+  const [insight, setInsight] = useState<InsightData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const { getFormData } = useSimulationStorage()
+
   const fetchInsight = useCallback(
-    async (simulationId: string = id) => {
-      // A ref muda imediatamente, antes de o React atualizar isLoading.
-      if (isRequestPending.current) return
+    async (simulationId: string) => {
+      const simulation = getFormData(simulationId)
+
+      if (!simulation) {
+        setError('Simulação não encontrada.')
+        return
+      }
 
       isRequestPending.current = true
       setIsLoading(true)
       setError(null)
 
       try {
-        const simulation = getFormData(simulationId)
-        if (!simulation) {
-          setError('Simulação não encontrada.')
-          return
-        }
-
-        if (simulation.insight) {
-          setInsight(simulation.insight)
-          return simulation.insight
-        }
-
         const prompt = buildAIPrompt(simulation)
         const data = await getInsight(prompt)
-        updateSimulation(simulationId, { ...simulation, insight: data })
         setInsight(data)
         return data
       } catch {
@@ -48,22 +37,24 @@ export const useInsight = (id: string) => {
         setIsLoading(false)
       }
     },
-    [id, getFormData, updateSimulation],
+    [getFormData],
   )
 
   useEffect(() => {
-    if (insight || isLoading || isRequestPending.current || error) return
-
-    let cancelled = false
-    // Agenda a chamada após o efeito e descarta a execução limpa pelo Strict Mode.
-    void Promise.resolve().then(() => {
-      if (!cancelled) return fetchInsight(id)
-    })
-
-    return () => {
-      cancelled = true
+    // Evita loop infinito de requisições para a API do Gemini
+    if (insight || isLoading || isRequestPending.current || error) {
+      return
     }
-  }, [id, insight, isLoading, error, fetchInsight])
+
+    fetchInsight(id).then((data) => {
+      isRequestPending.current = false
+      if (!data) {
+        return
+      }
+
+      setInsight(data)
+    })
+  }, [id, insight, isLoading, fetchInsight])
 
   return { insight, isLoading, error, fetchInsight }
 }
