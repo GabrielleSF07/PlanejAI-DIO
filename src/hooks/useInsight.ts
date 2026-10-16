@@ -1,24 +1,36 @@
-import { useCallback, useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { buildAIPrompt } from '@/data/aiPrompt'
 import { useSimulationStorage } from '@/hooks/useSimulationStorage'
-import { getInsight, type InsightData } from '@/services/aiService'
+import {
+  getInsight,
+  type InsightData,
+  InsightError,
+} from '@/services/aiService'
 
 export const useInsight = (id: string) => {
   const isRequestPending = useRef(false)
-  const [insight, setInsight] = useState<InsightData | null>(null)
+  const { getFormData, updateSimulation } = useSimulationStorage()
+  const [insight, setInsight] = useState<InsightData | null>(
+    () => getFormData(id)?.insight ?? null,
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { getFormData } = useSimulationStorage()
-
   const fetchInsight = useCallback(
     async (simulationId: string) => {
+      if (isRequestPending.current) return
       const simulation = getFormData(simulationId)
 
       if (!simulation) {
         setError('Simulação não encontrada.')
         return
+      }
+
+      if (simulation.insight) {
+        setInsight(simulation.insight)
+        setError(null)
+        return simulation.insight
       }
 
       isRequestPending.current = true
@@ -28,16 +40,21 @@ export const useInsight = (id: string) => {
       try {
         const prompt = buildAIPrompt(simulation)
         const data = await getInsight(prompt)
+        updateSimulation(simulationId, { insight: data })
         setInsight(data)
         return data
-      } catch {
-        setError('Erro ao gerar o diagnóstico. Tente novamente.')
+      } catch (cause) {
+        setError(
+          cause instanceof InsightError
+            ? cause.message
+            : 'Não foi possível gerar ou salvar o diagnóstico. Tente novamente.',
+        )
       } finally {
         isRequestPending.current = false
         setIsLoading(false)
       }
     },
-    [getFormData],
+    [getFormData, updateSimulation],
   )
 
   useEffect(() => {
@@ -46,15 +63,14 @@ export const useInsight = (id: string) => {
       return
     }
 
-    fetchInsight(id).then((data) => {
-      isRequestPending.current = false
-      if (!data) {
-        return
-      }
-
-      setInsight(data)
+    let cancelled = false
+    void Promise.resolve().then(() => {
+      if (!cancelled) return fetchInsight(id)
     })
-  }, [id, insight, isLoading, fetchInsight])
+    return () => {
+      cancelled = true
+    }
+  }, [id, insight, isLoading, error, fetchInsight])
 
   return { insight, isLoading, error, fetchInsight }
 }
