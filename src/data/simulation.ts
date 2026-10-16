@@ -7,6 +7,8 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import type { InsightData } from '@/services/aiService'
+
 import type { FormStepProps } from '../components/features/Simulation/FormStep'
 
 export const simulationFormSteps = [
@@ -84,9 +86,14 @@ export const simulationFormSteps = [
       emojiIcon: '✨',
     },
   },
-] satisfies FormStepProps[]
+] as const satisfies FormStepProps[]
 
 export type SimulationFormData = Record<
   (typeof simulationFormSteps)[number]['id'],
   string
 >
+
+export type SimulationRecord = SimulationFormData & {
+  id: string
+  insight?: InsightData
+}
