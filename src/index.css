@@ -5,6 +5,12 @@
 @import '@fontsource/inter/800.css';
 @import './styles/theme.css';
 
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+}
+
 @layer base {
   body {
     @apply bg-background text-foreground;
